@@ -3,27 +3,44 @@ if arg[2] == "debug" then
 end
 
 local Player = require("src.player")
+local Bullet = require("src.bullet")
+
 local player
+local bullets = {}
 
--- Load some default values for our rectangle.
+local height = love.graphics.getHeight()
+local width = love.graphics.getWidth()
 function love.load()
-    player = Player
-    
+    love.window.setMode(800, 400)
+    player = Player.new(400, 200)
 end
 
--- Increase the size of the rectangle every frame.
 function love.update(dt)
-    
+    player:update(dt)
+
+    for i = #bullets, 1, -1 do
+        local bullet = bullets[i]
+        bullet:update(dt)
+        if(bullet.x > width or bullet.x < 0 or bullet.y > height or bullet.y < 0) then
+            table.remove(bullets, i)
+        end
+    end
 end
 
-
-
--- Draw a coloured rectangle.
 function love.draw()
-
+    player:draw()
+    for i, bullet in ipairs(bullets) do
+        bullet:draw()
+    end
 end
 
-
+function love.mousepressed(x, y, button)
+    if button == 1 then
+        local bullet = Bullet.new(player.x, player.y, player.angle)
+        table.insert(bullets, bullet)
+        
+    end
+end
 
 
 

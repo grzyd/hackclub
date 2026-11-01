@@ -1,20 +1,25 @@
-local player = {
-    x = 400,
-    y = 300,
-    speed = 200,
-    angle = 0,
-    radius = 15
+local Player = {}
+Player.__index = Player
 
-}
-
-
-
-function love.load()
-    love.window.setMode(800, 400)
+function Player.new(x, y)
+    local self = {
+        x = x,
+        y = y,
+        speed = 200,
+        angle = 0,
+        width = 40,
+        height = 40
+        
+    }    
+    setmetatable(self, Player)
+    return self
 end
 
--- Increase the size of the rectangle every frame.
-function love.update(dt)
+
+
+
+
+function Player:update(dt)
     local dx = 0
     local dy = 0
 
@@ -24,17 +29,40 @@ function love.update(dt)
     if love.keyboard.isDown("d") then dx = dx + 1 end
 
 
-    player.x = player.x + dx
-    player.y = player.y + dy
+    
+
+    local length = math.sqrt(dx * dx + dy * dy)
+
+    if length > 0 then
+        dx = dx / length
+        dy = dy / length
+    end
+
+    self.x = self.x + dx * self.speed * dt
+    self.y = self.y + dy * self.speed * dt
+
+
+    local mx, my = love.mouse.getPosition()
+
+    self.angle = math.atan2(
+        my - self.y,
+        mx - self.x
+    )
+    local width = love.graphics.getWidth()
+    local height = love.graphics.getHeight()
+
+    self.x = math.max(self.width/2, math.min(self.x, width-self.width/2))
+    self.y = math.max(self.height/2, math.min(self.y, height-self.height/2))
 end
 
-function love.draw()
+function Player:draw()
     love.graphics.push()
 
-    love.graphics.translate(player.x, player.y)
-    love.graphics.rectangle("fill", 200, 100, 40, 40)
+    love.graphics.translate(self.x, self.y)
+    love.graphics.rotate(self.angle)
+    love.graphics.rectangle("fill", -20, -20, self.width, self.height)
     love.graphics.pop()
 end
 
 
-return player
+return Player
