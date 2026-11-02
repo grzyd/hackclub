@@ -8,7 +8,8 @@ function Player.new(x, y)
         speed = 200,
         angle = 0,
         width = 40,
-        height = 40
+        height = 40,
+        damage = 20
         
     }    
     setmetatable(self, Player)
