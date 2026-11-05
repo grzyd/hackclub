@@ -5,7 +5,9 @@ end
 local Player = require("src.player")
 local Bullet = require("src.bullet")
 local Enemy = require("src.enemy")
+local World = require("src.world")
 
+local map
 local player
 local bullets = {}
 local enemies = {}
@@ -13,8 +15,9 @@ local enemies = {}
 
 
 function love.load()
-    love.window.setMode(1600, 800)
-    player = Player.new(400, 200)
+    love.window.setMode(1600, 900)
+    player = Player.new(500, 200)
+    map = World.new(love.graphics.getWidth() / 16)
     table.insert(enemies, Enemy.new(300, 300))
     table.insert(enemies, Enemy.new(500, 300))
     table.insert(enemies, Enemy.new(123, 300))
@@ -25,14 +28,16 @@ function love.load()
 end
 
 function love.update(dt)
-    player:update(dt)
+    player:update(dt, map)
 
     for i = #bullets, 1, -1 do
         local bullet = bullets[i]
         bullet:update(dt)
 
         if bullet.x > Width or bullet.x < 0
-        or bullet.y > Height or bullet.y < 0 then
+            or bullet.y > Height or bullet.y < 0 then
+            table.remove(bullets, i)
+        elseif (map:colides(bullet.x, bullet.y, bullet.radius, bullet.radius))then
             table.remove(bullets, i)
         else
             for j = #enemies, 1, -1 do
@@ -48,22 +53,28 @@ function love.update(dt)
             end
         end
     end
+    player.fireTimer = player.fireTimer - dt
+    if love.mouse.isDown(1) then
+        Shoot()
+    end
 end
 
 function love.draw()
+    map:draw()
     player:draw()
-    for i, enemy in ipairs(enemies) do
+    for _, enemy in ipairs(enemies) do
         enemy:draw()
     end
-    for i, bullet in ipairs(bullets) do
+    for _, bullet in ipairs(bullets) do
         bullet:draw()
     end
 end
 
-function love.mousepressed(x, y, button)
-    if button == 1 then
+function Shoot()
+    if player.fireTimer <= 0 then
         local bullet = Bullet.new(player.x, player.y, player.angle)
         table.insert(bullets, bullet)
+        player.fireTimer = 1 / player.fireRate
     end
 end
 

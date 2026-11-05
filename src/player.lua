@@ -9,18 +9,16 @@ function Player.new(x, y)
         angle = 0,
         width = 40,
         height = 40,
-        damage = 20
-        
-    }    
+        damage = 20,
+        fireRate = 2,
+        fireTimer = 0
+
+    }
     setmetatable(self, Player)
     return self
 end
 
-
-
-
-
-function Player:update(dt)
+function Player:update(dt, gameMap)
     local dx = 0
     local dy = 0
 
@@ -30,7 +28,7 @@ function Player:update(dt)
     if love.keyboard.isDown("d") then dx = dx + 1 end
 
 
-    
+
 
     local length = math.sqrt(dx * dx + dy * dy)
 
@@ -38,9 +36,16 @@ function Player:update(dt)
         dx = dx / length
         dy = dy / length
     end
+    local moveX = dx * self.speed * dt
+    local moveY = dy * self.speed * dt
+    if not gameMap:colides(self.x + moveX, self.y, self.height, self.width) then
+        self.x = self.x + moveX
+    end
+    if not gameMap:colides(self.x, self.y + moveY, self.height, self.width) then
+        self.y = self.y + moveY
+    end
 
-    self.x = self.x + dx * self.speed * dt
-    self.y = self.y + dy * self.speed * dt
+    
 
 
     local mx, my = love.mouse.getPosition()
@@ -52,18 +57,17 @@ function Player:update(dt)
     local width = love.graphics.getWidth()
     local height = love.graphics.getHeight()
 
-    self.x = math.max(self.width/2, math.min(self.x, width-self.width/2))
-    self.y = math.max(self.height/2, math.min(self.y, height-self.height/2))
+    self.x = math.max(self.width / 2, math.min(self.x, width - self.width / 2))
+    self.y = math.max(self.height / 2, math.min(self.y, height - self.height / 2))
 end
 
 function Player:draw()
     love.graphics.push()
-
+    love.graphics.setColor(1, 1, 1)
     love.graphics.translate(self.x, self.y)
     love.graphics.rotate(self.angle)
     love.graphics.rectangle("fill", -20, -20, self.width, self.height)
     love.graphics.pop()
 end
-
 
 return Player
