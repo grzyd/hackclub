@@ -1,13 +1,14 @@
 local Bullet = {}
 Bullet.__index = Bullet
 
-function Bullet.new(x, y, angle)
+function Bullet.new(x, y, angle, damage)
     local self = {
         x = x,
         y = y,
         speed = 600,
         angle = angle,
-        radius = 5
+        radius = 5,
+        damage = damage
         
     }    
     setmetatable(self, Bullet)
@@ -31,3 +32,5 @@ end
 
 
 return Bullet
+
+

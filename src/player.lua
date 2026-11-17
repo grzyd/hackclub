@@ -1,17 +1,18 @@
 local Player = {}
 Player.__index = Player
 
-function Player.new(x, y)
+function Player.new(x, y, map)
     local self = {
-        x = x,
-        y = y,
+        x = (x - 0.5) * map.tileSize,
+        y = (y - 0.5) * map.tileSize,
         speed = 200,
         angle = 0,
         width = 40,
         height = 40,
         damage = 20,
         fireRate = 2,
-        fireTimer = 0
+        fireTimer = 0,
+        health = 100
 
     }
     setmetatable(self, Player)
