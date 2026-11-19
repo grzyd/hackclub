@@ -12,7 +12,8 @@ function Player.new(x, y, map)
         damage = 20,
         fireRate = 2,
         fireTimer = 0,
-        health = 100
+        health = 100,
+        maxHealth = 100
 
     }
     setmetatable(self, Player)
@@ -70,5 +71,26 @@ function Player:draw()
     love.graphics.rectangle("fill", -20, -20, self.width, self.height)
     love.graphics.pop()
 end
+
+function Player:drawHealtBar()
+    local barWidth = 200
+    local barHeight = 20
+
+    local x = 30
+    local y = 30
+
+    local healthProcentage = self.health/self.maxHealth
+
+
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.rectangle("fill", x, y, barWidth, barHeight)
+
+    love.graphics.setColor(0.2, 0.8, 0.2)
+    love.graphics.rectangle("fill", x, y, barWidth*healthProcentage, barHeight)
+
+    love.graphics.setColor(1,1,1)
+
+end
+
 
 return Player

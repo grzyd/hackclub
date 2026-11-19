@@ -3,20 +3,10 @@ map.__index = map
 
 
 
-function map.new(tile)
+function map.new(tile, layout)
     local self = {
         tileSize = tile,
-        MapLayout = {
-            { 31, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, -- first digit ground type, second digit enemy 
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4 }
-        }
+        MapLayout = layout
 
     }
     setmetatable(self, map)
@@ -25,11 +15,16 @@ end
 
 function map:load()
     self.grassImage = love.graphics.newImage("src/gfx/grass.png")
-
     self.grassQuad = love.graphics.newQuad(
         0, 0,
         self.tileSize, self.tileSize,
         self.grassImage:getDimensions()
+    )
+    self.pathImg = love.graphics.newImage("src/gfx/path.png")
+    self.pathQuad = love.graphics.newQuad(
+        0, 0,
+        self.tileSize, self.tileSize,
+        self.pathImg:getDimensions()
     )
 end
 
@@ -41,7 +36,7 @@ function map:draw()
                 groundType = tile
             end
             if groundType == 1 then
-                love.graphics.setColor(0.3, 0.3, 0.3)
+                love.graphics.setColor(0.6, 0.6, 0.4)
             elseif groundType == 2 then
                 love.graphics.setColor(0.1, 0.1, 0.1)
             elseif groundType == 3 then
@@ -53,8 +48,17 @@ function map:draw()
                     (x - 1) * self.tileSize,
                     (y - 1) * self.tileSize
                 )
+            elseif groundType == 4 then
+                love.graphics.setColor(1, 1, 1)
+
+                love.graphics.draw(
+                    self.pathImg,
+                    self.pathQuad,
+                    (x - 1) * self.tileSize,
+                    (y - 1) * self.tileSize
+                )
             end
-            if groundType ~= 3 then
+            if groundType ~= 3 and groundType ~= 4 then
                 love.graphics.rectangle(
                     "fill",
                     (x - 1) * self.tileSize,
@@ -122,11 +126,9 @@ function map:colides(x, y, h, w)
         for col = left, right do
             local tile = self.MapLayout[row] and self.MapLayout[row][col]
             if tile then
-                local groundType = math.floor(tile / 10)
-                if groundType == 0 then
-                    groundType = tile
-                end
-                if groundType ~= 1 and groundType ~= 3 then
+                local groundType = tile >= 10 and math.floor(tile / 10) or tile
+
+                if groundType ~= 1 and groundType ~= 3 and groundType ~= 4 then
                     return true
                 end
             end
